@@ -1,6 +1,18 @@
 @DocumentProcessing.Api_HostAddress = http://localhost:5222
 
-GET {{DocumentProcessing.Api_HostAddress}}/weatherforecast/
+POST {{DocumentProcessing.Api_HostAddress}}/api/documents/upload
+Content-Type: application/json
+
+{
+  "customerId": "CUST-1001",
+  "documentType": "PAN",
+  "fileName": "pan-card.pdf",
+  "fileContentBase64": "dGVzdC1wYXlsb2Fk"
+}
+
+###
+
+GET {{DocumentProcessing.Api_HostAddress}}/api/documents/status/00000000-0000-0000-0000-000000000000
 Accept: application/json
 
 ###
