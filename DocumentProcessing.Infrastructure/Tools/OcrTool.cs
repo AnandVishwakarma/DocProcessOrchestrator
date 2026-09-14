@@ -101,13 +101,11 @@ public sealed class OcrTool : IOcrTool
 
     private static string SimulateExtraction(DocumentType documentType, string fileName, string fileContentBase64)
     {
-        // 1. Inspect the incoming base64 payload to allow testing dynamic inputs
         try
         {
             var rawBytes = Convert.FromBase64String(fileContentBase64);
             var decoded = System.Text.Encoding.UTF8.GetString(rawBytes).Trim();
 
-            // If the decoded content is a direct test string (e.g. "INVALID", a test PAN, or custom text), use it
             if (!string.IsNullOrWhiteSpace(decoded) && decoded.All(c => !char.IsControl(c) || c == '\r' || c == '\n'))
             {
                 return $"EXTRACTED_CONTENT:{Environment.NewLine}{decoded}{Environment.NewLine}Source: {fileName}";
@@ -115,10 +113,10 @@ public sealed class OcrTool : IOcrTool
         }
         catch
         {
-            // Ignore parsing errors and proceed to fallback templates
+            
         }
 
-        // 2. Default standard simulation fallback
+        
         return documentType switch
         {
             DocumentType.Pan => $"INCOME TAX DEPARTMENT{Environment.NewLine}Permanent Account Number{Environment.NewLine}ABCDE1234F{Environment.NewLine}Source: {fileName}",
