@@ -1,0 +1,198 @@
+{
+  "info": {
+    "_postman_id": "a7c4e9d1-2b58-4f0a-9c31-6e8d5b1a4f72",
+    "name": "Document Processing Orchestrator",
+    "description": "Task 1007 Section 9 — KYC document upload and workflow status against DocumentProcessing.Api.\n\nImport this collection, confirm `baseUrl` (default `http://localhost:5222`), then run the upload requests. Each successful upload stores `documentId` on the collection so Fetch Workflow Status can be sent without copying the id by hand.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5222"
+    },
+    {
+      "key": "documentId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Valid PAN Upload",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "    const json = pm.response.json();",
+              "    if (json && json.documentId) {",
+              "        pm.collectionVariables.set('documentId', json.documentId);",
+              "    }",
+              "} catch (e) {",
+              "    console.log('No documentId to save.');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"CUST-10028471\",\n  \"documentType\": \"PAN\",\n  \"fileName\": \"pan_valid.pdf\",\n  \"fileContentBase64\": \"QUJDREUxMjM0Rg==\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/documents/upload",
+        "description": "Happy-path PAN. Decoded payload is `ABCDE1234F` (five letters, four digits, one letter). Expected **200** with `status`: `APPROVED`."
+      }
+    },
+    {
+      "name": "Valid Aadhaar Upload",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "    const json = pm.response.json();",
+              "    if (json && json.documentId) {",
+              "        pm.collectionVariables.set('documentId', json.documentId);",
+              "    }",
+              "} catch (e) {",
+              "    console.log('No documentId to save.');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"CUST-10028471\",\n  \"documentType\": \"AADHAR\",\n  \"fileName\": \"aadhaar_valid.pdf\",\n  \"fileContentBase64\": \"MjM0NTY3ODkwMTIz\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/documents/upload",
+        "description": "Happy-path Aadhaar. Decoded payload is `234567890123` (12 digits). Expected **200** with `status`: `APPROVED`."
+      }
+    },
+    {
+      "name": "Invalid Document",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "    const json = pm.response.json();",
+              "    if (json && json.documentId) {",
+              "        pm.collectionVariables.set('documentId', json.documentId);",
+              "    }",
+              "} catch (e) {",
+              "    console.log('No documentId to save.');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"CUST-10028471\",\n  \"documentType\": \"PAN\",\n  \"fileName\": \"pan_invalid.pdf\",\n  \"fileContentBase64\": \"SU5WQUxJRFBBTk5VTUJFUg==\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/documents/upload",
+        "description": "Structurally invalid PAN. Decoded payload is `INVALIDPANNUMBER`. Expected **200** with `status`: `REJECTED` (business rejection is not an HTTP error)."
+      }
+    },
+    {
+      "name": "Malformed Base64",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "    const json = pm.response.json();",
+              "    if (json && json.documentId) {",
+              "        pm.collectionVariables.set('documentId', json.documentId);",
+              "    }",
+              "} catch (e) {",
+              "    console.log('No documentId to save.');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"CUST-10028471\",\n  \"documentType\": \"PAN\",\n  \"fileName\": \"pan_malformed.pdf\",\n  \"fileContentBase64\": \"not-a-valid-base64!!!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/documents/upload",
+        "description": "Invalid Base64 in `fileContentBase64`. Expected **400 Bad Request** (`FileContentBase64 is not valid base64.`)."
+      }
+    },
+    {
+      "name": "Fetch Workflow Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/documents/status/{{documentId}}",
+        "description": "Reads the persisted workflow snapshot for `{{documentId}}`. Run any successful upload first so the collection variable is populated. Expected **200** with `status`, `message`, `extractedText`, and `updatedUtc`; **404** if the id is unknown."
+      }
+    }
+  ]
+}

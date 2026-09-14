@@ -18,5 +18,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Serve wwwroot/index.html at "/" before MVC routing so the workflow console loads directly.
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
 app.Run();
